@@ -1,0 +1,19 @@
+#Prisma actually uses this thing called GraphQL Import, so I can import for example the Item type which Im returnting in Mutation. This is done by putting a comment
+#It's gonna import all of the types and all the inputs from prisma.graphql, if it's not used in our schema it's not going to be imported
+#So in mutation I can return an Item without having the type of item defined in this public facing API
+
+# import * from './generated/prisma.graphql'
+
+# type Dog {
+#     name: String!
+# }
+
+type Mutation {
+    # createDog(name: String!): Dog
+    createItem(title: String, description: String, price: Int, image: String, largeImage: String): Item!
+}
+
+type Query {
+    #dogs: [Dog]!
+    items: [Item]! # items gonna return an array of item
+}

@@ -1,0 +1,16 @@
+#everytime i make a change to what my data model looks like I have to deploy it to Prisma, to do that: prisma deploy 
+
+type User {
+  id: ID! @id
+  name: String!
+  email: String!
+}
+
+type Item {
+  id: ID! @id
+  title: String!
+  description: String!
+  image: String
+  largeImage: String
+  price: Int!
+}
