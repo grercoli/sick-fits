@@ -10,6 +10,8 @@ type BatchPayload {
   count: Long!
 }
 
+scalar DateTime
+
 type Item {
   id: ID!
   title: String!
@@ -17,6 +19,8 @@ type Item {
   image: String
   largeImage: String
   price: Int!
+  createdAt: DateTime!
+  updatedAt: DateTime!
 }
 
 type ItemConnection {
@@ -26,6 +30,7 @@ type ItemConnection {
 }
 
 input ItemCreateInput {
+  id: ID
   title: String!
   description: String!
   image: String
@@ -64,6 +69,8 @@ type ItemPreviousValues {
   image: String
   largeImage: String
   price: Int!
+  createdAt: DateTime!
+  updatedAt: DateTime!
 }
 
 type ItemSubscriptionPayload {
@@ -85,6 +92,14 @@ input ItemSubscriptionWhereInput {
 }
 
 input ItemUpdateInput {
+  title: String
+  description: String
+  image: String
+  largeImage: String
+  price: Int
+}
+
+input ItemUpdateManyMutationInput {
   title: String
   description: String
   image: String
@@ -171,6 +186,22 @@ input ItemWhereInput {
   price_lte: Int
   price_gt: Int
   price_gte: Int
+  createdAt: DateTime
+  createdAt_not: DateTime
+  createdAt_in: [DateTime!]
+  createdAt_not_in: [DateTime!]
+  createdAt_lt: DateTime
+  createdAt_lte: DateTime
+  createdAt_gt: DateTime
+  createdAt_gte: DateTime
+  updatedAt: DateTime
+  updatedAt_not: DateTime
+  updatedAt_in: [DateTime!]
+  updatedAt_not_in: [DateTime!]
+  updatedAt_lt: DateTime
+  updatedAt_lte: DateTime
+  updatedAt_gt: DateTime
+  updatedAt_gte: DateTime
   AND: [ItemWhereInput!]
   OR: [ItemWhereInput!]
   NOT: [ItemWhereInput!]
@@ -185,12 +216,15 @@ scalar Long
 type Mutation {
   createItem(data: ItemCreateInput!): Item!
   updateItem(data: ItemUpdateInput!, where: ItemWhereUniqueInput!): Item
-  updateManyItems(data: ItemUpdateInput!, where: ItemWhereInput): BatchPayload!
+  updateManyItems(data: ItemUpdateManyMutationInput!, where: ItemWhereInput): BatchPayload!
   upsertItem(where: ItemWhereUniqueInput!, create: ItemCreateInput!, update: ItemUpdateInput!): Item!
   deleteItem(where: ItemWhereUniqueInput!): Item
   deleteManyItems(where: ItemWhereInput): BatchPayload!
   createUser(data: UserCreateInput!): User!
-  updateManyUsers(data: UserUpdateInput!, where: UserWhereInput): BatchPayload!
+  updateUser(data: UserUpdateInput!, where: UserWhereUniqueInput!): User
+  updateManyUsers(data: UserUpdateManyMutationInput!, where: UserWhereInput): BatchPayload!
+  upsertUser(where: UserWhereUniqueInput!, create: UserCreateInput!, update: UserUpdateInput!): User!
+  deleteUser(where: UserWhereUniqueInput!): User
   deleteManyUsers(where: UserWhereInput): BatchPayload!
 }
 
@@ -215,6 +249,7 @@ type Query {
   item(where: ItemWhereUniqueInput!): Item
   items(where: ItemWhereInput, orderBy: ItemOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Item]!
   itemsConnection(where: ItemWhereInput, orderBy: ItemOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): ItemConnection!
+  user(where: UserWhereUniqueInput!): User
   users(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [User]!
   usersConnection(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): UserConnection!
   node(id: ID!): Node
@@ -238,6 +273,7 @@ type UserConnection {
 }
 
 input UserCreateInput {
+  id: ID
   name: String!
   email: String!
 }
@@ -254,10 +290,6 @@ enum UserOrderByInput {
   name_DESC
   email_ASC
   email_DESC
-  createdAt_ASC
-  createdAt_DESC
-  updatedAt_ASC
-  updatedAt_DESC
 }
 
 type UserPreviousValues {
@@ -285,6 +317,11 @@ input UserSubscriptionWhereInput {
 }
 
 input UserUpdateInput {
+  name: String
+  email: String
+}
+
+input UserUpdateManyMutationInput {
   name: String
   email: String
 }
@@ -335,4 +372,8 @@ input UserWhereInput {
   AND: [UserWhereInput!]
   OR: [UserWhereInput!]
   NOT: [UserWhereInput!]
+}
+
+input UserWhereUniqueInput {
+  id: ID
 }

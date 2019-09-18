@@ -11,9 +11,13 @@
 type Mutation {
     # createDog(name: String!): Dog
     createItem(title: String, description: String, price: Int, image: String, largeImage: String): Item!
+    updateItem(id: ID!, title: String, description: String, price: Int): Item!
+    deleteItem(id: ID!): Item
 }
 
 type Query {
     #dogs: [Dog]!
-    items: [Item]! # items gonna return an array of item
+    items(where: ItemWhereInput, orderBy: ItemOrderByInput, skip: Int, first: Int): [Item]! # items gonna return an array of item. El where sirve para que lo que es searching. El orderBy por si quiero tenerlos ordenados por el mas reciente por ejemplo. The first and the skip are going to say: I want to skip the first four items but i want to bring back four items in total
+    item(where: ItemWhereUniqueInput!): Item
+    itemsConnection(where: ItemWhereInput): ItemConnection!
 }

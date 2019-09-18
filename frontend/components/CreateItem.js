@@ -70,7 +70,10 @@ class CreateItem extends Component {
         return (
             // cuando se dispara Mutation a traves de variables={this.state} le paso a CREATE_ITEM_MUTATION las propiedades que tengo en el state
             // el unico hijo de una mutation es una funcion, justo al igual que query
-            <Mutation mutation={CREATE_ITEM_MUTATION} variables={this.state}>
+            <Mutation 
+                mutation={CREATE_ITEM_MUTATION} 
+                variables={this.state}
+            >
                 {(createItem, { loading, error }) => ( // me trae dos argumentos: (mutationfunction y payload), pero el primero puedo nombrarlo al igual que esta arriba como createItem (como esta en el server). Para el payload puedo aplicarle destructuring { loading, error, called, data }. Call will give me a boolean if it's been run or not and data will give the data that actually comes back
                     <Form 
                         onSubmit={async e => {

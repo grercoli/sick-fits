@@ -1,4 +1,4 @@
 //This way I'm reusing the same page
-import Home from './index';
+import Items from './index';
 
-export default Home;
+export default Items;
