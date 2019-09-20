@@ -19,7 +19,16 @@ const { forwardTo } = require('prisma-binding');
 const Query = {
     items: forwardTo('db'),
     item: forwardTo('db'),
-    itemsConnection: forwardTo('db')
+    itemsConnection: forwardTo('db'),
+    me(parent, args, ctx, info) {
+        // check if there is not a current user ID, so i have to access to the request
+        if(!ctx.request.userId) {
+            return null;
+        }
+        return ctx.db.query.user({ //devuelve el usuario, me puedo fijar como esta en las mutations de prisma.graphql. We are retorning a promise here so we do not need to wait for that to resolve
+            where: { id: ctx.request.userId }
+        }, info); // important to put info: the info is going to be the actual query that's coming from the client side
+    }
 };
 
 module.exports = Query;

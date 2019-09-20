@@ -10,6 +10,8 @@ type BatchPayload {
   count: Long!
 }
 
+scalar DateTime
+
 type Item {
   id: ID!
   title: String!
@@ -17,6 +19,8 @@ type Item {
   image: String
   largeImage: String
   price: Int!
+  createdAt: DateTime!
+  updatedAt: DateTime!
 }
 
 type ItemConnection {
@@ -26,6 +30,7 @@ type ItemConnection {
 }
 
 input ItemCreateInput {
+  id: ID
   title: String!
   description: String!
   image: String
@@ -64,6 +69,8 @@ type ItemPreviousValues {
   image: String
   largeImage: String
   price: Int!
+  createdAt: DateTime!
+  updatedAt: DateTime!
 }
 
 type ItemSubscriptionPayload {
@@ -85,6 +92,14 @@ input ItemSubscriptionWhereInput {
 }
 
 input ItemUpdateInput {
+  title: String
+  description: String
+  image: String
+  largeImage: String
+  price: Int
+}
+
+input ItemUpdateManyMutationInput {
   title: String
   description: String
   image: String
@@ -171,6 +186,22 @@ input ItemWhereInput {
   price_lte: Int
   price_gt: Int
   price_gte: Int
+  createdAt: DateTime
+  createdAt_not: DateTime
+  createdAt_in: [DateTime!]
+  createdAt_not_in: [DateTime!]
+  createdAt_lt: DateTime
+  createdAt_lte: DateTime
+  createdAt_gt: DateTime
+  createdAt_gte: DateTime
+  updatedAt: DateTime
+  updatedAt_not: DateTime
+  updatedAt_in: [DateTime!]
+  updatedAt_not_in: [DateTime!]
+  updatedAt_lt: DateTime
+  updatedAt_lte: DateTime
+  updatedAt_gt: DateTime
+  updatedAt_gte: DateTime
   AND: [ItemWhereInput!]
   OR: [ItemWhereInput!]
   NOT: [ItemWhereInput!]
@@ -185,12 +216,15 @@ scalar Long
 type Mutation {
   createItem(data: ItemCreateInput!): Item!
   updateItem(data: ItemUpdateInput!, where: ItemWhereUniqueInput!): Item
-  updateManyItems(data: ItemUpdateInput!, where: ItemWhereInput): BatchPayload!
+  updateManyItems(data: ItemUpdateManyMutationInput!, where: ItemWhereInput): BatchPayload!
   upsertItem(where: ItemWhereUniqueInput!, create: ItemCreateInput!, update: ItemUpdateInput!): Item!
   deleteItem(where: ItemWhereUniqueInput!): Item
   deleteManyItems(where: ItemWhereInput): BatchPayload!
   createUser(data: UserCreateInput!): User!
-  updateManyUsers(data: UserUpdateInput!, where: UserWhereInput): BatchPayload!
+  updateUser(data: UserUpdateInput!, where: UserWhereUniqueInput!): User
+  updateManyUsers(data: UserUpdateManyMutationInput!, where: UserWhereInput): BatchPayload!
+  upsertUser(where: UserWhereUniqueInput!, create: UserCreateInput!, update: UserUpdateInput!): User!
+  deleteUser(where: UserWhereUniqueInput!): User
   deleteManyUsers(where: UserWhereInput): BatchPayload!
 }
 
@@ -211,10 +245,20 @@ type PageInfo {
   endCursor: String
 }
 
+enum Permission {
+  ADMIN
+  USER
+  ITEMCREATE
+  ITEMUPDATE
+  ITEMDELETE
+  PERMISSIONUPDATE
+}
+
 type Query {
   item(where: ItemWhereUniqueInput!): Item
   items(where: ItemWhereInput, orderBy: ItemOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Item]!
   itemsConnection(where: ItemWhereInput, orderBy: ItemOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): ItemConnection!
+  user(where: UserWhereUniqueInput!): User
   users(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [User]!
   usersConnection(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): UserConnection!
   node(id: ID!): Node
@@ -229,6 +273,12 @@ type User {
   id: ID!
   name: String!
   email: String!
+  password: String!
+  resetToken: String
+  resetTokenExpiry: String
+  permissions: [Permission!]!
+  createdAt: DateTime!
+  updatedAt: DateTime!
 }
 
 type UserConnection {
@@ -238,8 +288,17 @@ type UserConnection {
 }
 
 input UserCreateInput {
+  id: ID
   name: String!
   email: String!
+  password: String!
+  resetToken: String
+  resetTokenExpiry: String
+  permissions: UserCreatepermissionsInput
+}
+
+input UserCreatepermissionsInput {
+  set: [Permission!]
 }
 
 type UserEdge {
@@ -254,6 +313,12 @@ enum UserOrderByInput {
   name_DESC
   email_ASC
   email_DESC
+  password_ASC
+  password_DESC
+  resetToken_ASC
+  resetToken_DESC
+  resetTokenExpiry_ASC
+  resetTokenExpiry_DESC
   createdAt_ASC
   createdAt_DESC
   updatedAt_ASC
@@ -264,6 +329,12 @@ type UserPreviousValues {
   id: ID!
   name: String!
   email: String!
+  password: String!
+  resetToken: String
+  resetTokenExpiry: String
+  permissions: [Permission!]!
+  createdAt: DateTime!
+  updatedAt: DateTime!
 }
 
 type UserSubscriptionPayload {
@@ -287,6 +358,23 @@ input UserSubscriptionWhereInput {
 input UserUpdateInput {
   name: String
   email: String
+  password: String
+  resetToken: String
+  resetTokenExpiry: String
+  permissions: UserUpdatepermissionsInput
+}
+
+input UserUpdateManyMutationInput {
+  name: String
+  email: String
+  password: String
+  resetToken: String
+  resetTokenExpiry: String
+  permissions: UserUpdatepermissionsInput
+}
+
+input UserUpdatepermissionsInput {
+  set: [Permission!]
 }
 
 input UserWhereInput {
@@ -332,7 +420,70 @@ input UserWhereInput {
   email_not_starts_with: String
   email_ends_with: String
   email_not_ends_with: String
+  password: String
+  password_not: String
+  password_in: [String!]
+  password_not_in: [String!]
+  password_lt: String
+  password_lte: String
+  password_gt: String
+  password_gte: String
+  password_contains: String
+  password_not_contains: String
+  password_starts_with: String
+  password_not_starts_with: String
+  password_ends_with: String
+  password_not_ends_with: String
+  resetToken: String
+  resetToken_not: String
+  resetToken_in: [String!]
+  resetToken_not_in: [String!]
+  resetToken_lt: String
+  resetToken_lte: String
+  resetToken_gt: String
+  resetToken_gte: String
+  resetToken_contains: String
+  resetToken_not_contains: String
+  resetToken_starts_with: String
+  resetToken_not_starts_with: String
+  resetToken_ends_with: String
+  resetToken_not_ends_with: String
+  resetTokenExpiry: String
+  resetTokenExpiry_not: String
+  resetTokenExpiry_in: [String!]
+  resetTokenExpiry_not_in: [String!]
+  resetTokenExpiry_lt: String
+  resetTokenExpiry_lte: String
+  resetTokenExpiry_gt: String
+  resetTokenExpiry_gte: String
+  resetTokenExpiry_contains: String
+  resetTokenExpiry_not_contains: String
+  resetTokenExpiry_starts_with: String
+  resetTokenExpiry_not_starts_with: String
+  resetTokenExpiry_ends_with: String
+  resetTokenExpiry_not_ends_with: String
+  createdAt: DateTime
+  createdAt_not: DateTime
+  createdAt_in: [DateTime!]
+  createdAt_not_in: [DateTime!]
+  createdAt_lt: DateTime
+  createdAt_lte: DateTime
+  createdAt_gt: DateTime
+  createdAt_gte: DateTime
+  updatedAt: DateTime
+  updatedAt_not: DateTime
+  updatedAt_in: [DateTime!]
+  updatedAt_not_in: [DateTime!]
+  updatedAt_lt: DateTime
+  updatedAt_lte: DateTime
+  updatedAt_gt: DateTime
+  updatedAt_gte: DateTime
   AND: [UserWhereInput!]
   OR: [UserWhereInput!]
   NOT: [UserWhereInput!]
+}
+
+input UserWhereUniqueInput {
+  id: ID
+  email: String
 }

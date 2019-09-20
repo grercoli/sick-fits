@@ -1,6 +1,7 @@
 #Prisma actually uses this thing called GraphQL Import, so I can import for example the Item type which Im returnting in Mutation. This is done by putting a comment
 #It's gonna import all of the types and all the inputs from prisma.graphql, if it's not used in our schema it's not going to be imported
 #So in mutation I can return an Item without having the type of item defined in this public facing API
+#El import de abajo se escribe asi comentado, es la forma que tiene graphql de importar todo de prisma.graphql.. Por eso va a tomar la forma de Item o User por ejemplo.
 
 # import * from './generated/prisma.graphql'
 
@@ -8,11 +9,20 @@
 #     name: String!
 # }
 
+# CADA VEZ QUE AGREGO ALGO EN EL SCHEMA DESPUES TENGO QUE AGREGARLO EN LOS RESOLVERS
+# this is a custom type: own types
+type SuccessMessage {
+    message: String
+}
+
 type Mutation {
     # createDog(name: String!): Dog
     createItem(title: String, description: String, price: Int, image: String, largeImage: String): Item!
     updateItem(id: ID!, title: String, description: String, price: Int): Item!
     deleteItem(id: ID!): Item
+    signup(email: String!, password: String!, name: String!): User!
+    signin(email: String!, password: String!): User!
+    signout: SuccessMessage
 }
 
 type Query {
@@ -20,4 +30,5 @@ type Query {
     items(where: ItemWhereInput, orderBy: ItemOrderByInput, skip: Int, first: Int): [Item]! # items gonna return an array of item. El where sirve para que lo que es searching. El orderBy por si quiero tenerlos ordenados por el mas reciente por ejemplo. The first and the skip are going to say: I want to skip the first four items but i want to bring back four items in total
     item(where: ItemWhereUniqueInput!): Item
     itemsConnection(where: ItemWhereInput): ItemConnection!
+    me: User #no hay necesidad de pasarle el userId porque se va a pasar automaticamente solo gracias a que va a ir con la request como se puso en index.js en el middleware
 }

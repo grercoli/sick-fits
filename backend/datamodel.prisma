@@ -1,9 +1,26 @@
 #everytime i make a change to what my data model looks like I have to deploy it to Prisma, to do that: prisma deploy 
+#permissions: [Permission] it's gonna be an array of type Permission and it's gonna be an enum
+#PERMISSIONUPDATE gonna be sort of a circular one where if you only are an admin or if you have the PERMISSIONUPDATE will you be able to update that
+
+enum Permission {
+  ADMIN
+  USER
+  ITEMCREATE
+  ITEMUPDATE
+  ITEMDELETE
+  PERMISSIONUPDATE
+}
 
 type User {
   id: ID! @id @unique
   name: String!
-  email: String!
+  email: String! @unique
+  password: String!
+  resetToken: String
+  resetTokenExpiry: String
+  permissions: [Permission] @scalarList(strategy: RELATION)
+  createdAt: DateTime! @createdAt
+  updatedAt: DateTime! @updatedAt
 }
 
 type Item {

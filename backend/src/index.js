@@ -1,12 +1,30 @@
 // this file is going to start up our Node server, is the entry point of our application
 
+const cookieParser = require('cookie-parser');
+const jwt = require('jsonwebtoken');
 require('dotenv').config({ path: '.env'});
 const createServer = require('./createServer');
 const db = require('./db');
 
 const server = createServer();
 
-// TODO use express middleware to handle cookies (JWT: Jason web tokens)
+// Use express middleware to handle cookies (JWT: Jason web tokens)
+server.express.use(cookieParser()); //server.express.use allows us to use any existing express middleware. server.express.use(cookieParser()): allow us to access all of the cookies in a nice formatted object rather than just a cookie string, that it normally comes in as a header.
+
+// This gonna be our own custom middleware: decode the JWT so we can get the user Id on each request. Se ejecuta en cada request de una pagina
+server.express.use((req, res, next) => {
+    //pull the token out of the request
+    const { token } = req.cookies;
+    //decode that token
+    if (token) {
+        //take the userId out of the token
+        const { userId } = jwt.verify(token, process.env.APP_SECRET);
+        //put the userId onto the request for future requests to access
+        req.userId = userId;
+    }
+    next(); //allow us to modify the request and then keep the request going so our Yoga server and the database would pick it up
+});
+
 // TODO use express middleware to populate current user
 
 server.start({
