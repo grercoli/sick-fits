@@ -15,6 +15,7 @@
 // };
 
 const { forwardTo } = require('prisma-binding');
+const { hasPermission } = require('../utils');
 
 const Query = {
     items: forwardTo('db'),
@@ -28,6 +29,16 @@ const Query = {
         return ctx.db.query.user({ //devuelve el usuario, me puedo fijar como esta en las mutations de prisma.graphql. We are retorning a promise here so we do not need to wait for that to resolve
             where: { id: ctx.request.userId }
         }, info); // important to put info: the info is going to be the actual query that's coming from the client side
+    },
+    async users(parent, args, ctx, info) {
+        // 1. Check if they are logged in
+        if(!ctx.request.userId) { //como se repite varias veces en varios lados puedo crear una funcion para esto
+            throw new Error('You must be logged in!');
+        }
+        // 2. Check if the user has the permissions to query all the users
+        hasPermission(ctx.request.user, ['ADMIN', 'PERMISSIONUPDATE']); // si esto esta bien entonces el codigo va a seguir corriendo sino va a tirar un error: No tienes permisos suficientes
+        // 3. If they do query all the users
+        return ctx.db.query.users({}, info); // we can pass an empty where object because we just want to query all of the users. The info is going to include the graph QL query that contains the fields that we are requesting from the front end.
     }
 };
 

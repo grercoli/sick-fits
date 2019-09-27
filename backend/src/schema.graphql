@@ -23,6 +23,9 @@ type Mutation {
     signup(email: String!, password: String!, name: String!): User!
     signin(email: String!, password: String!): User!
     signout: SuccessMessage
+    requestReset(email: String!): SuccessMessage
+    resetPassword(resetToken: String!, password: String!, confirmPassword: String!): User!
+    updatePermissions(permissions: [Permission], userId: ID!): User
 }
 
 type Query {
@@ -31,4 +34,12 @@ type Query {
     item(where: ItemWhereUniqueInput!): Item
     itemsConnection(where: ItemWhereInput): ItemConnection!
     me: User #no hay necesidad de pasarle el userId porque se va a pasar automaticamente solo gracias a que va a ir con la request como se puso en index.js en el middleware
+    users: [User]!
+}
+
+type User {
+  id: ID!
+  name: String!
+  email: String!
+  permissions: [Permission!]!
 }

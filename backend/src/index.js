@@ -25,7 +25,16 @@ server.express.use((req, res, next) => {
     next(); //allow us to modify the request and then keep the request going so our Yoga server and the database would pick it up
 });
 
-// TODO use express middleware to populate current user
+// Create a middleware to populate current user on each request if they are logged in
+server.express.use(async (req, res, next) => {
+    // if they arent logged in, skip this
+    if(!req.userId) {
+        return next(); // we want this function to stop running
+    }
+    const user = await db.query.user({ where: { id: req.userId }}, '{ id, permissions, email, name }'); // como segundo parametro traemos los campos que queremos
+    req.user = user;
+    next();
+});
 
 server.start({
     cors: { //we only want this endpoint to be able to be visited from our approved URLs (para que no pueda ser accedido el endpoint desde cualquier website)

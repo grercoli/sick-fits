@@ -21,7 +21,7 @@ class MyApp extends App {
         <ApolloProvider client={apollo}>
           <Page>
               <Component {...pageProps} />
-              {console.log(pageProps)}
+              {/* {console.log(pageProps)} */}
           </Page>
         </ApolloProvider>
     );
