@@ -3,6 +3,7 @@ import gql from 'graphql-tag';
 import { Query } from 'react-apollo';
 import PropTypes from 'prop-types';
 
+//inside of the cart its gonna be many cart items. So each cartItem will have an ID and a quantity
 const CURRENT_USER_QUERY = gql`
     query {
         me {
@@ -10,6 +11,17 @@ const CURRENT_USER_QUERY = gql`
             email
             name
             permissions
+            cart {
+                id
+                quantity
+                item {
+                    id
+                    price
+                    image
+                    title
+                    description
+                }
+            }
         }
     }
 `;

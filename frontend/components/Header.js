@@ -3,6 +3,7 @@ import Router from 'next/router';
 import NProgress from 'nprogress'; //tambien gracias a que en Meta.js importe los estilos con <link ...>
 import styled from 'styled-components';
 import Nav from './Nav';
+import Cart from './Cart';
 
 //We listen for the events are on the router. Take a look at doc: https://github.com/zeit/next.js/#with-link y fijarse en los router events
 Router.events.on('routeChangeStart', () => {
@@ -66,7 +67,7 @@ const Header = () => (
         <div className="sub-bar">
             <p>Search</p>
         </div>
-        <div>Cart</div>
+        <Cart />
     </StyleHeader>
 );
 

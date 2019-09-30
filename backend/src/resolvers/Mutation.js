@@ -200,6 +200,60 @@ const Mutations = {
                 id: args.userId // we might be updating someone else user not mine so that's why i dont use currentUser
             }
         }, info);
+    },
+    async addToCart(parent, args, ctx, info) {
+        // 1. Make sure they are signed in
+        const { userId } = ctx.request;
+        if(!userId) {
+            throw new Error('You must be signed in soon');
+        }
+        // 2. Query the users current cart: its for multiple items
+        // si me tira un error: ctx.db.querycartItems is not a function or its return value its not iterable es porque es una promise y no puse el await
+        const [existingCartItem] = await ctx.db.query.cartItems({ //we are going to destructure the first element that is returned into a variable called existingCartItem. It's cartItems (not cartItem) because we want to query it based on both the "users id", as well as the "item id" that they are trying to put in. So we want to know, has this user put this item into their cart before, and if this user has not put this item into their cart before, then we are gonna make a new one. And if I were just to use cartItem just to query one, it wouldnt work.
+            where: {
+                user: { id: userId },
+                item: { id: args.id }
+            }
+        });
+        // 3. Check if that item is already in their cart and increment by 1 if it is
+        if(existingCartItem) {
+            return ctx.db.mutation.updateCartItem({
+                where: { id: existingCartItem.id },
+                data: { quantity: existingCartItem.quantity + 1 }
+            }, info);
+        }
+        // 4. If its not, create a fresh CartItem for that user
+        return ctx.db.mutation.createCartItem({ // a cartItem is just a pointer at who has it and item is it
+            data: {
+                user: {
+                    connect: { id: userId } //asi se hacen las relationships (con el connect)
+                },
+                item: {
+                    connect: { id: args.id }
+                }
+            }
+        }, info);
+    },
+    async removeFromCart(parent, args, ctx, info) {
+        // 1.Find the cart item
+        const cartItem = await ctx.db.query.cartItem(
+            {
+              where: {
+                id: args.id,
+              },
+            },
+            `{ id, user { id }}`
+          ); //We need to know who owns the cart item. Instead of passing info I pass { id, user { id }} because our final query is not going to ask for the user, we just need the ID. So: { id, user { id }} we want the id of the cart item, we also want the user of the cart item along with the user's ID.
+        // 1.5 Make sure we found an item
+        if (!cartItem) throw new Error('No CartItem Found!');
+        // 2. Make sure they own that cart item
+        if (cartItem.user.id !== ctx.request.userId) {
+            throw new Error('Cheatin huhhhh');
+        }
+        // 3. Delete that cart item
+        return ctx.db.mutation.deleteCartItem({
+            where: { id: args.id },
+        }, info);
     }
 };
 
