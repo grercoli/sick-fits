@@ -32,7 +32,7 @@ function createClient({ headers }) { //los headers son muy importantes cuando en
         }
       }, //takes resolver for our mutations
       defaults: {
-        cartOpen: true
+        cartOpen: false
       } //for the data when it loads (its the same when a componente loads for the first time and the initial state is initialized)
     }
   });

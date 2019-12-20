@@ -1,6 +1,7 @@
 import React from 'react';
 import { Query, Mutation } from 'react-apollo';
 import gql from 'graphql-tag';
+import { adopt } from 'react-adopt';
 import CartStyles from './styles/CartStyles';
 import Supreme from './styles/Supreme';
 import CloseButton from './styles/CloseButton';
@@ -22,33 +23,39 @@ const TOGGLE_CART_MUTATION = gql`
     }
 `;
 
+//new component Composed: adopt is going to take an object with all the things we would like to compose into each other
+/* eslint-disable */
+const Composed = adopt({
+    user: ({ render }) => <User>{render}</User>,//first we want to compose the User component
+    toggleCart: ({ render }) => <Mutation mutation={TOGGLE_CART_MUTATION}>{render}</Mutation>,
+    localState: ({ render }) => <Query query={LOCAL_STATE_QUERY}>{render}</Query>
+});
+/* eslint-enable */
+
 const Cart = () => {
     return (
-        <User>
-            {({ data: { me }}) => {
-                if(!me) return null; //we dont wanna show the cart unless the person is logged in
+        <Composed>
+            {({user, toggleCart, localState}) => { //its going to be just one object and we can destructure it into user, toggleCart and localState
+                const me = user.data.me;
+                if(!me) return null;
                 return (
-                    <Mutation mutation={TOGGLE_CART_MUTATION}>{(toggleCart) => (
-                        <Query query={LOCAL_STATE_QUERY}>{({ data }) => (
-                            <CartStyles open={data.cartOpen}>
-                                <header>
-                                    <CloseButton onClick={toggleCart} title="close">&times;</CloseButton>
-                                    <Supreme>{me.name}'s Cart</Supreme>
-                                    <p>You Have {me.cart.length} Item{me.cart.length === 1 ? '' : 's'} in your cart.</p>
-                                </header>
-                                <ul>
-                                    {me.cart.map(cartItem => <CartItem key={cartItem.id} cartItem={cartItem} />)}
-                                </ul>
-                                <footer>
-                                    <p>{formatMoney(calcTotalPrice(me.cart))}</p>
-                                    <SickButton>Checkout</SickButton>
-                                </footer>
-                            </CartStyles>
-                        )}</Query>
-                    )}</Mutation>
+                    <CartStyles open={localState.data.cartOpen}>
+                        <header>
+                            <CloseButton onClick={toggleCart} title="close">&times;</CloseButton>
+                            <Supreme>{me.name}'s Cart</Supreme>
+                            <p>You Have {me.cart.length} Item{me.cart.length === 1 ? '' : 's'} in your cart.</p>
+                        </header>
+                        <ul>
+                            {me.cart.map(cartItem => <CartItem key={cartItem.id} cartItem={cartItem} />)}
+                        </ul>
+                        <footer>
+                            <p>{formatMoney(calcTotalPrice(me.cart))}</p>
+                            <SickButton>Checkout</SickButton>
+                        </footer>
+                    </CartStyles>
                 );
             }}
-        </User>
+        </Composed>
     );
 }
 
